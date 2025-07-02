@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Challenge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Login Screen */
+        .login-form, .register-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .error-msg {
+            color: #e74c3c;
+            margin-top: 10px;
+            padding: 10px;
+            background: #ffe6e6;
+            border-radius: 5px;
+            display: none;
+        }
+
+        /* Game Screen */
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 30px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #4facfe;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .timer {
+            font-size: 2em;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .question-box {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-left: 5px solid #4facfe;
+        }
+
+        .question-number {
+            color: #4facfe;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .question-text {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .answer-input {
+            width: 150px;
+            padding: 15px;
+            font-size: 1.2em;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin-right: 15px;
+        }
+
+        .submit-btn {
+            padding: 15px 30px;
+            font-size: 1.1em;
+        }
+
+        .result-box {
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .result-correct {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .result-wrong {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f1b0b7;
+        }
+
+        /* Developer Mode */
+        .dev-panel {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .dev-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .dev-controls input {
+            width: 80px;
+            padding: 5px;
+            text-align: center;
+        }
+
+        /* Results Screen */
+        .results-summary {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .final-score {
+            font-size: 3em;
+            color: #4facfe;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .explanation-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .explanation-question {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .explanation-answer {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .hearts {
+            display: flex;
+            gap: 10px;
+        }
+
+        .heart {
+            color: #e74c3c;
+            font-size: 1.5em;
+        }
+
+        .heart.lost {
+            color: #ccc;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                margin: 10px;
+            }
+            
+            .game-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .game-stats {
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>The Challenge</h1>
+            <p>조합론 마스터에 도전하세요!</p>
+        </div>
+
+        <div class="content">
+            <!-- Login Screen -->
+            <div id="loginScreen" class="screen active">
+                <div class="login-form">
+                    <h2 style="text-align: center; margin-bottom: 30px;">로그인</h2>
+                    <div class="form-group">
+                        <label for="loginId">아이디</label>
+                        <input type="text" id="loginId" placeholder="아이디를 입력하세요">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">비밀번호</label>
+                        <input type="password" id="loginPassword" placeholder="비밀번호를 입력하세요">
+                    </div>
+                    <div style="text-align: center;">
+                        <button class="btn" onclick="login()">로그인</button>
+                        <button class="btn btn-secondary" onclick="showRegister()">회원가입</button>
+                    </div>
+                    <div id="loginError" class="error-msg"></div>
+                </div>
+            </div>
+
+            <!-- Register Screen -->
+            <div id="registerScreen" class="screen">
+                <div class="register-form">
+                    <h2 style="text-align: center; margin-bottom: 30px;">회원가입</h2>
+                    <div class="form-group">
+                        <label for="regId">아이디</label>
+                        <input type="text" id="regId" placeholder="아이디 (유니코드 문자 허용)">
+                    </div>
+                    <div class="form-group">
+                        <label for="regPassword">비밀번호</label>
+                        <input type="password" id="regPassword" placeholder="8자 이상, 대소문자/숫자/특수문자 중 3종 이상">
+                    </div>
+                    <div class="form-group">
+                        <label for="regPasswordConfirm">비밀번호 확인</label>
+                        <input type="password" id="regPasswordConfirm" placeholder="비밀번호를 다시 입력하세요">
+                    </div>
+                    <div style="text-align: center;">
+                        <button class="btn" onclick="register()">가입하기</button>
+                        <button class="btn btn-secondary" onclick="showLogin()">로그인으로</button>
+                    </div>
+                    <div id="regError" class="error-msg"></div>
+                </div>
+            </div>
+
+            <!-- Game Screen -->
+            <div id="gameScreen" class="screen">
+                <div class="game-header">
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="currentScore">0</div>
+                            <div class="stat-label">점수</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="questionNum">1</div>
+                            <div class="stat-label">문제</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="hearts" id="hearts">
+                                <span class="heart">♥</span>
+                                <span class="heart">♥</span>
+                                <span class="heart">♥</span>
+                            </div>
+                            <div class="stat-label">생명</div>
+                        </div>
+                    </div>
+                    <div class="timer" id="timer">10:00</div>
+                </div>
+
+                <!-- Developer Panel -->
+                <div id="devPanel" class="dev-panel" style="display: none;">
+                    <h3>🛠️ 개발자 모드</h3>
+                    <div class="dev-controls">
+                        <label>현재 문제 점수:</label>
+                        <input type="number" id="scoreInput" min="1" max="100" value="10">
+                        <button class="btn" onclick="updateScore()">점수 변경</button>
+                        <button class="btn btn-secondary" onclick="skipQuestion()">문제 건너뛰기</button>
+                    </div>
+                </div>
+
+                <div class="question-box">
+                    <div class="question-number" id="questionCategory">기본 순열/조합</div>
+                    <div class="question-text" id="questionText">문제를 불러오는 중...</div>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <input type="number" id="answerInput" class="answer-input" placeholder="답 (0-999)" min="0" max="999">
+                        <button class="btn submit-btn" onclick="submitAnswer()">제출</button>
+                    </div>
+                </div>
+
+                <div id="resultBox" class="result-box" style="display: none;"></div>
+            </div>
+
+            <!-- Results Screen -->
+            <div id="resultsScreen" class="screen">
+                <div class="results-summary">
+                    <div class="final-score" id="finalScore">0</div>
+                    <h2>게임 종료!</h2>
+                    <p id="gameResult">수고하셨습니다!</p>
+                </div>
+
+                <div id="explanations">
+                    <!-- 해설들이 여기에 추가됩니다 -->
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn" onclick="startNewGame()">다시 도전</button>
+                    <button class="btn btn-secondary" onclick="logout()">로그아웃</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 게임 상태
+        let currentUser = null;
+        let gameState = {
+            currentQuestion: 0,
+            score: 0,
+            wrongAnswers: 0,
+            timeLeft: 600, // 10분 = 600초
+            timer: null,
+            questions: [],
+            answers: [],
+            isDevMode: false
+        };
+
+        const questionBank = [
+{
+    category: "포함배제 원리",
+    question: "1부터 94까지의 자연수 중 7, 6, 3 중 적어도 하나로 나누어지는 수의 개수를 1000으로 나눈 나머지는?",
+    answer: 48,
+    score: 10,
+    explanation: "포함배제: 13+15+31-2-4-5+0 = 48"
+},
+{
+    category: "분할과 분배",
+    question: "6개의 서로 다른 공을 3개의 서로 다른 상자에 빈 상자 없이 나누는 방법의 수를 1000으로 나눈 나머지는?",
+    answer: 540,
+    score: 12,
+    explanation: "S(6,3)×3! = 90×6 = 540"
+},
+{
+    category: "점화식 & 카탈란 수",
+    question: "2쌍의 괄호로 만들 수 있는 올바른 괄호 문자열의 수를 1000으로 나눈 나머지는?",
+    answer: 2,
+    score: 10,
+    explanation: "Catalan(2) = 2"
+},
+{
+    category: "🔥 특별 문제",
+    question: "정의역 {1,...,1999}, 공역 {2000,...,2003}인 함수 f에서 f(1)+...+f(1999)가 짝수인 함수 개수를 1000으로 나눈 나머지는?",
+    answer: 128,
+    score: 50,
+    explanation: "전체 경우의 수: 4^1999 → 짝수 조건: 절반 = 4^1998 = 128 mod 1000"
+},
+          {
+    category: "특수 순열",
+    question: "3개의 원소로 만들 수 있는 완전 교란 순열의 수를 1000으로 나눈 나머지는?",
+    answer: 2,
+    score: 10,
+    explanation: "D(3) = 2"
+},
+{
+    category: "계산 집약적",
+    question: "3개의 빨간 공, 2개의 파란 공, 1개의 초록 공을 일렬로 나열하는 경우의 수를 1000으로 나눈 나머지는?",
+    answer: 60,
+    score: 12,
+    explanation: "6! / (3!×2!×1!) = 720 / 12 = 60"
+},
+{
+    category: "포함배제 원리",
+    question: "1부터 80까지 자연수 중 4 또는 5의 배수인 수의 개수를 1000으로 나눈 나머지는?",
+    answer: 36,
+    score: 10,
+    explanation: "20 + 16 - 4 = 32"
+},
+{
+    category: "분할과 분배",
+    question: "7개의 서로 다른 공을 3개의 서로 다른 상자에 빈 상자 없이 나누는 방법의 수를 1000으로 나눈 나머지는?",
+    answer: 864,
+    score: 12,
+    explanation: "S(7,3)×3! = 144×6 = 864"
+},
+{
+    category: "점화식 & 카탈란 수",
+    question: "3쌍의 괄호로 만들 수 있는 올바른 괄호 문자열의 수를 1000으로 나눈 나머지는?",
+    answer: 5,
+    score: 10,
+    explanation: "Catalan(3) = 5"
+},
+{
+    category: "특수 순열",
+    question: "4개의 원소로 만들 수 있는 완전 교란 순열의 수를 1000으로 나눈 나머지는?",
+    answer: 9,
+    score: 10,
+    explanation: "D(4) = 9"
+},
+{
+    category: "계산 집약적",
+    question: "2개의 빨간 공, 2개의 파란 공, 1개의 초록 공을 일렬로 나열하는 경우의 수를 1000으로 나눈 나머지는?",
+    answer: 30,
+    score: 12,
+    explanation: "5! / (2!×2!×1!) = 120 / 4 = 30"
+},
+{
+    category: "포함배제 원리",
+    question: "1부터 90까지 자연수 중 3 또는 5의 배수인 수의 개수를 1000으로 나눈 나머지는?",
+    answer: 48,
+    score: 10,
+    explanation: "30 + 18 - 6 = 42"
+},
+{
+    category: "분할과 분배",
+    question: "6개의 서로 다른 공을 2개의 서로 다른 상자에 빈 상자 없이 나누는 방법의 수를 1000으로 나눈 나머지는?",
+    answer: 62,
+    score: 12,
+    explanation: "S(6,2)×2! = 31×2 = 62"
+},
+{
+    category: "점화식 & 카탈란 수",
+    question: "5쌍의 괄호로 만들 수 있는 올바른 괄호 문자열의 수를 1000으로 나눈 나머지는?",
+    answer: 42,
+    score: 10,
+    explanation: "Catalan(5) = 42"
+},
+{
+    category: "특수 순열",
+    question: "5개의 원소로 만들 수 있는 완전 교란 순열의 수를 1000으로 나눈 나머지는?",
+    answer: 44,
+    score: 10,
+    explanation: "D(5) = 44"
+},
+{
+    category: "계산 집약적",
+    question: "2개의 빨간 공, 1개의 파란 공, 1개의 초록 공을 일렬로 나열하는 경우의 수를 1000으로 나눈 나머지는?",
+    answer: 12,
+    score: 12,
+    explanation: "4! / (2!×1!×1!) = 24 / 2 = 12"
+},
+{
+    category: "포함배제 원리",
+    question: "1부터 100까지 자연수 중 2 또는 3의 배수인 수의 개수를 1000으로 나눈 나머지는?",
+    answer: 67,
+    score: 10,
+    explanation: "50 + 33 - 16 = 67"
+},
+{
+    category: "분할과 분배",
+    question: "8개의 서로 다른 공을 3개의 서로 다른 상자에 빈 상자 없이 나누는 방법의 수를 1000으로 나눈 나머지는?",
+    answer: 0,
+    score: 12,
+    explanation: "S(8,3)×3! = 966×6 = 5796 → 5796 % 1000 = 796"
+},
+{
+    category: "점화식 & 카탈란 수",
+    question: "6쌍의 괄호로 만들 수 있는 올바른 괄호 문자열의 수를 1000으로 나눈 나머지는?",
+    answer: 132,
+    score: 10,
+    explanation: "Catalan(6) = 132"
+},
+{
+    category: "특수 순열",
+    question: "6개의 원소로 만들 수 있는 완전 교란 순열의 수를 1000으로 나눈 나머지는?",
+    answer: 265,
+    score: 10,
+    explanation: "D(6) = 265"
+},
+{
+    category: "계산 집약적",
+    question: "3개의 빨간 공, 1개의 파란 공, 1개의 초록 공을 일렬로 나열하는 경우의 수를 1000으로 나눈 나머지는?",
+    answer: 20,
+    score: 12,
+    explanation: "5! / (3!×1!×1!) = 120 / 6 = 20"
+},
+{
+    category: "포함배제 원리",
+    question: "1부터 70까지 자연수 중 5 또는 6의 배수인 수의 개수를 1000으로 나눈 나머지는?",
+    answer: 24,
+    score: 10,
+    explanation: "14 + 11 - 2 = 23"
+},
+{
+    category: "분할과 분배",
+    question: "5개의 서로 다른 공을 3개의 서로 다른 상자에 빈 상자 없이 나누는 방법의 수를 1000으로 나눈 나머지는?",
+    answer: 150,
+    score: 12,
+    explanation: "S(5,3)×3! = 25×6 = 150"
+},
+{
+    category: "점화식 & 카탈란 수",
+    question: "7쌍의 괄호로 만들 수 있는 올바른 괄호 문자열의 수를 1000으로 나눈 나머지는?",
+    answer: 429,
+    score: 10,
+    explanation: "Catalan(7) = 429"
+},
+{
+    category: "계산 집약적",
+    question: "5개의 빨간 공, 1개의 파란 공, 2개의 초록 공을 일렬로 나열하는 경우의 수를 1000으로 나눈 나머지는?",
+    answer: 120,
+    score: 12,
+    explanation: "8! / (5!×1!×2!) = 40320 / 120 = 336"
+},
+{
+    category: "포함배제 원리",
+    question: "1부터 60까지 자연수 중 3, 6, 9의 배수인 수의 개수를 1000으로 나눈 나머지는?",
+    answer: 21,
+    score: 10,
+    explanation: "20 + 10 - 7 = 23"
+},
+{
+    category: "분할과 분배",
+    question: "7개의 서로 다른 공을 4개의 서로 다른 상자에 빈 상자 없이 나누는 방법의 수를 1000으로 나눈 나머지는?",
+    answer: 840,
+    score: 12,
+    explanation: "S(7,4)×4! = 140×24 = 3360 → 3360 % 1000 = 360"
+},{
+    category: "계산 집약적",
+    question: "3개의 빨간 공, 3개의 파란 공을 일렬로 나열하는 경우의 수를 1000으로 나눈 나머지는?",
+    answer: 20,
+    score: 12,
+    explanation: "6! / (3!×3!) = 720 / 36 = 20"
+},
+{
+    category: "포함배제 원리",
+    question: "1부터 100까지 자연수 중 4 또는 7의 배수인 수의 개수를 1000으로 나눈 나머지는?",
+    answer: 39,
+    score: 10,
+    explanation: "25 + 14 - 7 = 32"
+},
+{
+    category: "분할과 분배",
+    question: "9개의 서로 다른 공을 4개의 서로 다른 상자에 빈 상자 없이 나누는 방법의 수를 1000으로 나눈 나머지는?",
+    answer: 480,
+    score: 12,
+    explanation: "S(9,4)×4! = 3025×24 = 72600 → 72600 % 1000 = 600"
+},
+{
+    category: "점화식 & 카탈란 수",
+    question: "8쌍의 괄호로 만들 수 있는 올바른 괄호 문자열의 수를 1000으로 나눈 나머지는?",
+    answer: 429,
+    score: 10,
+    explanation: "Catalan(8) = 429"
+},
+{
+    category: "계산 집약적",
+    question: "2개의 빨간 공, 3개의 파란 공, 2개의 초록 공을 일렬로 나열하는 경우의 수를 1000으로 나눈 나머지는?",
+    answer: 60,
+    score: 12,
+    explanation: "7! / (2!×3!×2!) = 5040 / 12 = 420"
+},
+{
+    category: "포함배제 원리",
+    question: "1부터 50까지 자연수 중 2, 4, 6의 배수인 수의 개수를 1000으로 나눈 나머지는?",
+    answer: 25,
+    score: 10,
+    explanation: "25 + 12 - 7 = 31"
+},
+{
+    category: "분할과 분배",
+    question: "10개의 서로 다른 공을 5개의 서로 다른 상자에 빈 상자 없이 나누는 방법의 수를 1000으로 나눈 나머지는?",
+    answer: 370,
+    score: 12,
+    explanation: "S(10,5)×5! = 425×120 = 51000 → 51000 % 1000 = 0"
+},{
+    category: "기하학적 조합론",
+    question: "평면상의 4개의 직선이 일반적 위치에 있을 때 평면을 나누는 영역의 개수는?",
+    answer: 11,
+    score: 12,
+    explanation: "n개 직선이 일반적 위치에 있을 때: 1 + n + C(n,2) = 1 + 4 + 6 = 11"
+},
+{
+    category: "기하학적 조합론",
+    question: "평면상의 5개의 직선이 일반적 위치에 있을 때 평면을 나누는 영역의 개수는?",
+    answer: 16,
+    score: 12,
+    explanation: "n개 직선이 일반적 위치에 있을 때: 1 + n + C(n,2) = 1 + 5 + 10 = 16"
+},
+{
+    category: "기하학적 조합론",
+    question: "평면상의 6개의 직선이 일반적 위치에 있을 때 평면을 나누는 영역의 개수는?",
+    answer: 22,
+    score: 12,
+    explanation: "n개 직선이 일반적 위치에 있을 때: 1 + n + C(n,2) = 1 + 6 + 15 = 22"
+},
+{
+    category: "기하학적 조합론",
+    question: "정육각형의 꼭짓점 6개 중 3개를 선택하여 만드는 삼각형의 개수는?",
+    answer: 20,
+    score: 12,
+    explanation: "C(6,3) = 20. 모든 3개 점의 조합이 삼각형을 만든다."
+},
+{
+    category: "기하학적 조합론",
+    question: "평면상의 7개의 직선이 일반적 위치에 있을 때 평면을 나누는 영역의 개수는?",
+    answer: 29,
+    score: 12,
+    explanation: "n개 직선이 일반적 위치에 있을 때: 1 + n + C(n,2) = 1 + 7 + 21 = 29"
+},
+{
+    category: "기하학적 조합론",
+    question: "평면상의 8개의 직선이 일반적 위치에 있을 때 평면을 나누는 영역의 개수는?",
+    answer: 37,
+    score: 12,
+    explanation: "n개 직선이 일반적 위치에 있을 때: 1 + n + C(n,2) = 1 + 8 + 28 = 37"
+},
+{
+    category: "기하학적 조합론",
+    question: "정오각형의 꼭짓점 5개 중 3개를 선택하여 만드는 삼각형의 개수는?",
+    answer: 10,
+    score: 12,
+    explanation: "C(5,3) = 10. 모든 3개 점의 조합이 삼각형을 만든다."
+},
+{
+    category: "기하학적 조합론",
+    question: "정사각형의 꼭짓점 4개 중 3개를 선택하여 만드는 삼각형의 개수는?",
+    answer: 4,
+    score: 12,
+    explanation: "C(4,3) = 4. 모든 3개 점의 조합이 삼각형을 만든다."
+},
+{
+    category: "기하학적 조합론",
+    question: "평면상의 9개의 직선이 일반적 위치에 있을 때 평면을 나누는 영역의 개수는?",
+    answer: 46,
+    score: 12,
+    explanation: "n개 직선이 일반적 위치에 있을 때: 1 + n + C(n,2) = 1 + 9 + 36 = 46"
+},
+{
+    category: "기하학적 조합론",
+    question: "정구의 꼭짓점 6개 중 3개를 선택하여 만드는 삼각형의 개수는?",
+    answer: 20,
+    score: 12,
+    explanation: "C(6,3) = 20. 모든 3개 점의 조합이 삼각형을 만든다."
+},
+{
+    category: "기하학적 조합론",
+    question: "평면상의 10개의 직선이 일반적 위치에 있을 때 평면을 나누는 영역의 개수는?",
+    answer: 56,
+    score: 12,
+    explanation: "n개 직선이 일반적 위치에 있을 때: 1 + n + C(n,2) = 1 + 10 + 45 = 56"
+},
+{
+    category: "기하학적 조합론",
+    question: "정사각형의 꼭짓점 5개 중 3개를 선택하여 만드는 삼각형의 개수는?",
+    answer: 10,
+    score: 12,
+    explanation: "C(5,3) = 10. 모든 3개 점의 조합이 삼각형을 만든다."
+}
+,{
+    category: "기본 순열/조합 심화",
+    question: "서로 다른 5개의 구슬 중 3개를 뽑아 일렬로 나열하는 경우의 수를 1000으로 나눈 나머지는?",
+    answer: 60,
+    score: 8,
+    explanation: "5P3 = 5! / (5-3)! = 5×4×3 = 60"
+},
+{
+    category: "기본 순열/조합 심화",
+    question: "3개의 빨간 공, 3개의 파란 공을 일렬로 나열하는 경우의 수를 1000으로 나눈 나머지는?",
+    answer: 20,
+    score: 10,
+    explanation: "6! / (3!×3!) = 720 / 36 = 20"
+},
+{
+    category: "기본 순열/조합 심화",
+    question: "3개의 빨간 공, 2개의 파란 공을 일렬로 나열하는 경우의 수를 1000으로 나눈 나머지는?",
+    answer: 30,
+    score: 12,
+    explanation: "5! / (3!×2!) = 120 / 12 = 10"
+},
+{
+    category: "기본 순열/조합 심화",
+    question: "6개의 공이 있을 때, 각기 다른 3개의 구슬을 뽑아 중복 없이 일렬로 나열하는 방법은?",
+    answer: 120,
+    score: 15,
+    explanation: "6P3 = 6! / (6-3)! = 6×5×4 = 120"
+},
+{
+    category: "기본 순열/조합 심화",
+    question: "1부터 10까지의 숫자 중 5개를 고른 후 순서를 바꾸는 방법의 수를 1000으로 나눈 나머지는?",
+    answer: 120,
+    score: 12,
+    explanation: "10P5 = 10! / 5! = 30240 / 120 = 252"
+},
+{
+    category: "기본 순열/조합 심화",
+    question: "4개의 공을 2개씩 나누어주는 방법의 수를 1000으로 나눈 나머지는?",
+    answer: 6,
+    score: 8,
+    explanation: "4C2 = 4! / (2!×2!) = 6"
+},
+{
+    category: "기본 순열/조합 심화",
+    question: "서로 다른 7개의 공을 3개씩 나누어주는 방법의 수를 1000으로 나눈 나머지는?",
+    answer: 35,
+    score: 12,
+    explanation: "7C3 = 7! / (3!×4!) = 35"
+},
+{
+    category: "기본 순열/조합 심화",
+    question: "5개의 서로 다른 공을 3개의 상자에 빈 상자 없이 나누는 방법의 수를 1000으로 나눈 나머지는?",
+    answer: 60,
+    score: 10,
+    explanation: "S(5,3)×3! = 25×6 = 150"
+},
+{
+    category: "기본 순열/조합 심화",
+    question: "3개의 빨간 공, 3개의 파란 공, 2개의 초록 공을 일렬로 나열하는 경우의 수를 1000으로 나눈 나머지는?",
+    answer: 60,
+    score: 12,
+    explanation: "8! / (3!×3!×2!) = 40320 / 36 = 1120"
+},
+{
+    category: "기본 순열/조합 심화",
+    question: "1, 1, 2, 2, 3으로 만들 수 있는 서로 다른 5자리 수의 개수는?",
+    answer: 30,
+    score: 10,
+    explanation: "5! / (2!×2!×1!) = 120 / 4 = 30"
+}
+
+];
+
+
+        // 유틸리티 함수들
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            setTimeout(() => {
+                errorElement.style.display = 'none';
+            }, 5000);
+        }
+
+        // 간단한 해시 함수
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // 32bit integer로 변환
+            }
+            return Math.abs(hash).toString();
+        }
+
+        // 비밀번호 유효성 검사
+        function validatePassword(password) {
+            if (password.length < 8) return false;
+            
+            const hasUpper = /[A-Z]/.test(password);
+            const hasLower = /[a-z]/.test(password);
+            const hasNumber = /[0-9]/.test(password);
+            const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+            const hasOnlyAllowed = /^[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/.test(password);
+            
+            if (!hasOnlyAllowed) return false;
+            
+            const typeCount = [hasUpper, hasLower, hasNumber, hasSpecial].filter(Boolean).length;
+            return typeCount >= 3;
+        }
+
+        // 로그인 관련 함수들
+        function showLogin() {
+            showScreen('loginScreen');
+        }
+
+        function showRegister() {
+            showScreen('registerScreen');
+        }
+
+        function register() {
+            const id = document.getElementById('regId').value;
+            const password = document.getElementById('regPassword').value;
+            const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+
+            if (!id) {
+                showError('regError', '아이디를 입력해주세요.');
+                return;
+            }
+
+            if (!validatePassword(password)) {
+                showError('regError', '비밀번호는 8자 이상이며, 영문 대소문자, 숫자, 특수문자 중 3종 이상을 포함해야 합니다.');
+                return;
+            }
+
+            if (password !== passwordConfirm) {
+                showError('regError', '비밀번호가 일치하지 않습니다.');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('challengeUsers') || '{}');
+            if (users[id]) {
+                showError('regError', '이미 존재하는 아이디입니다.');
+                return;
+            }
+
+            users[id] = {
+                password: simpleHash(password),
+                scores: []
+            };
+            localStorage.setItem('challengeUsers', JSON.stringify(users));
+
+            alert('회원가입이 완료되었습니다!');
+            showLogin();
+        }
+
+        function login() {
+            const id = document.getElementById('loginId').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!id || !password) {
+                showError('loginError', '아이디와 비밀번호를 입력해주세요.');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('challengeUsers') || '{}');
+            
+            if (!users[id] || users[id].password !== simpleHash(password)) {
+                showError('loginError', '아이디 또는 비밀번호가 잘못되었습니다.');
+                return;
+            }
+
+            currentUser = id;
+            gameState.isDevMode = (id === 'DEV');
+            
+            startNewGame();
+        }
+
+        function logout() {
+            currentUser = null;
+            gameState.isDevMode = false;
+            showLogin();
+        }
+
+        // 게임 관련 함수들
+        function startNewGame() {
+            gameState = {
+                currentQuestion: 0,
+                score: 0,
+                wrongAnswers: 0,
+                timeLeft: 600,
+                timer: null,
+                questions: shuffleArray([...questionBank]),
+                answers: [],
+                isDevMode: currentUser === 'DEV'
+            };
+
+            showScreen('gameScreen');
+            
+            if (gameState.isDevMode) {
+                document.getElementById('devPanel').style.display = 'block';
+            }
+
+            updateHearts();
+            loadQuestion();
+            startTimer();
+        }
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function loadQuestion() {
+            if (gameState.currentQuestion >= gameState.questions.length) {
+                endGame();
+                return;
+            }
+
+            const question = gameState.questions[gameState.currentQuestion];
+            
+            document.getElementById('questionNum').textContent = gameState.currentQuestion + 1;
+            document.getElementById('questionCategory').textContent = question.category;
+            document.getElementById('questionText').textContent = question.question;
+            document.getElementById('currentScore').textContent = gameState.score;
+            document.getElementById('answerInput').value = '';
+            document.getElementById('resultBox').style.display = 'none';
+            
+            if (gameState.isDevMode) {
+                document.getElementById('scoreInput').value = question.score;
+            }
+        }
+
+        function startTimer() {
+            gameState.timer = setInterval(() => {
+                gameState.timeLeft--;
+                updateTimerDisplay();
+                
+                if (gameState.timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(gameState.timeLeft / 60);
+            const seconds = gameState.timeLeft % 60;
+            document.getElementById('timer').textContent = 
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateHearts() {
+            const hearts = document.querySelectorAll('.heart');
+            hearts.forEach((heart, index) => {
+                if (index < gameState.wrongAnswers) {
+                    heart.classList.add('lost');
+                } else {
+                    heart.classList.remove('lost');
+                }
+            });
+        }
+
+        function submitAnswer() {
+            const userAnswer = parseInt(document.getElementById('answerInput').value);
+            const currentQuestion = gameState.questions[gameState.currentQuestion];
+            const isCorrect = userAnswer === currentQuestion.answer;
+            
+            gameState.answers.push({
+                question: currentQuestion,
+                userAnswer: userAnswer,
+                correct: isCorrect
+            });
+
+            const resultBox = document.getElementById('resultBox');
+            resultBox.style.display = 'block';
+            
+            if (isCorrect) {
+                gameState.score += currentQuestion.score;
+                resultBox.className = 'result-box result-correct';
+                resultBox.innerHTML = `
+                    <div>정답입니다! +${currentQuestion.score}점</div>
+                    <div style="margin-top: 10px; font-size: 0.9em;">${currentQuestion.explanation}</div>
+                `;
+            } else {
+                gameState.wrongAnswers++;
+                resultBox.className = 'result-box result-wrong';
+                resultBox.innerHTML = `
+                    <div>틀렸습니다. 정답: ${currentQuestion.answer}</div>
+                    <div style="margin-top: 10px; font-size: 0.9em;">${currentQuestion.explanation}</div>
+                `;
+                updateHearts();
+                
+                if (gameState.wrongAnswers >= 3) {
+                    setTimeout(() => {
+                        endGame();
+                    }, 3000);
+                    return;
+                }
+            }
+
+            document.getElementById('currentScore').textContent = gameState.score;
+            
+            setTimeout(() => {
+                gameState.currentQuestion++;
+                loadQuestion();
+            }, 3000);
+        }
+
+        function endGame() {
+            clearInterval(gameState.timer);
+            
+            // 점수 저장
+            const users = JSON.parse(localStorage.getItem('challengeUsers') || '{}');
+            if (users[currentUser]) {
+                users[currentUser].scores.push({
+                    score: gameState.score,
+                    date: new Date().toISOString(),
+                    questionsAnswered: gameState.currentQuestion
+                });
+                localStorage.setItem('challengeUsers', JSON.stringify(users));
+            }
+
+            showResults();
+        }
+
+        function showResults() {
+            document.getElementById('finalScore').textContent = gameState.score;
+            
+            let resultMessage = '';
+            if (gameState.wrongAnswers >= 3) {
+                resultMessage = '3번 틀려서 게임이 종료되었습니다.';
+            } else if (gameState.timeLeft <= 0) {
+                resultMessage = '시간이 종료되었습니다.';
+            } else {
+                resultMessage = '모든 문제를 완료했습니다!';
+            }
+            document.getElementById('gameResult').textContent = resultMessage;
+
+            // 해설 표시
+            const explanationsDiv = document.getElementById('explanations');
+            explanationsDiv.innerHTML = '';
+            
+            gameState.answers.forEach((answer, index) => {
+                const explanationDiv = document.createElement('div');
+                explanationDiv.className = 'explanation-section';
+                explanationDiv.innerHTML = `
+                    <div class="explanation-question">
+                        문제 ${index + 1}: ${answer.question.question}
+                    </div>
+                    <div class="explanation-answer">
+                        <strong>정답:</strong> ${answer.question.answer}<br>
+                        <strong>당신의 답:</strong> ${answer.userAnswer} ${answer.correct ? '✓' : '✗'}<br>
+                        <strong>해설:</strong> ${answer.question.explanation}
+                    </div>
+                `;
+                explanationsDiv.appendChild(explanationDiv);
+            });
+
+            showScreen('resultsScreen');
+        }
+
+        // 개발자 모드 함수들
+        function updateScore() {
+            const newScore = parseInt(document.getElementById('scoreInput').value);
+            gameState.questions[gameState.currentQuestion].score = newScore;
+            alert(`현재 문제의 점수가 ${newScore}점으로 변경되었습니다.`);
+        }
+
+        function skipQuestion() {
+            gameState.currentQuestion++;
+            loadQuestion();
+        }
+
+        // 키보드 이벤트
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                const activeScreen = document.querySelector('.screen.active');
+                if (activeScreen.id === 'gameScreen') {
+                    submitAnswer();
+                } else if (activeScreen.id === 'loginScreen') {
+                    login();
+                } else if (activeScreen.id === 'registerScreen') {
+                    register();
+                }
+            }
+        });
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            showLogin();
+        });
+    </script>
+</body>
+</html>
